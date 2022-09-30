@@ -39,6 +39,7 @@ def index():
         #---- GET ALL ITEMS --------
         if request.method == "GET":
             cur = conn.cursor()
+            
             # gets all items from database that match current user
             cur.execute("SELECT ITEM, QUANTITY FROM GROCERIES WHERE USERNAME=?", (username,)) 
             data = cur.fetchall()
@@ -56,6 +57,7 @@ def index():
             
             # returns back to list
             return redirect(url_for("index"))
+    
     # returns user to login page if not logged in     
     else:
         return redirect(url_for("login"))  
@@ -74,6 +76,7 @@ def deleteItem():
 @app.route("/users")
 def getAllUsers():
     cur = conn.cursor()
+    
     # gets all users and returns in JSON object
     cur.execute("SELECT * FROM USER") 
     data = cur.fetchall()
@@ -87,27 +90,39 @@ def getAllUsers():
 #----------  LOGIN  ---------------------
 @app.route("/", methods=["POST", "GET"])
 def login():
+    
+    # if the user is in the current session then redirect to home page
     if "username" in session:
         username = session["username"]
         return redirect(url_for("index"))
+    
+    # post action to log in    
     elif request.method == "POST":
+        #saves user to current session
         session["username"] = request.form.get("username")
         cur = conn.cursor()
+        
+        # searches for user in database
         cur.execute("SELECT USERNAME FROM USER WHERE USERNAME=?", (session["username"],)) 
         data = cur.fetchall()
+        
         # if user is not in database it adds the user
         if len(data) == 0:
             cur.execute("INSERT INTO USER (USERNAME) VALUES(?)", (session['username'],))
         
+        # commits changes to database
         conn.commit()
         
         return redirect(url_for("index"))
+
+    # redirects to login page if none of the above are met    
     else:
         return render_template('login.html')
 
 #----------  LOGOUT  ---------------------
 @app.route("/logout", methods=["GET"])
 def logout():
+    #removes user from current session
     session.pop("username", None)
     return redirect(url_for("login"))
 
