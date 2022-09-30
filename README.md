@@ -9,6 +9,8 @@ A simple python CRUD application that allows you to add grocery items to a list.
                 style="display: block; margin: 0 auto; border: 1px solid black" />
 </p>
 
+## Live Demo: 
+https://grocery-list-python-app.herokuapp.com/ 
 
 ## Installation:
   `pip -r requirements.txt`
