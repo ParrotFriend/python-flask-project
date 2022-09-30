@@ -1,4 +1,4 @@
-# GROCERY LIST PYTHON FLASK PROJECT
+# GROCERY LIST - PYTHON FLASK PROJECT
 
 A simple python CRUD application that allows you to add grocery items to a list. This application uses Flask and SQLite3. 
 <p align="center">
