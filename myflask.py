@@ -12,6 +12,7 @@ import sqlite3
 app = Flask(__name__)
 app.secret_key ="jfioefefjioawfnieofa"
 
+# establishes connection to sqlite database
 conn = sqlite3.connect('grocerylist.db', check_same_thread=False)
 print('Database connected')
 
@@ -21,6 +22,7 @@ conn.execute('''CREATE TABLE IF NOT EXISTS USER
  USERNAME        TEXT    NOT NULL
  );''')
 
+# creates table to hold grocery items
 conn.execute('''CREATE TABLE IF NOT EXISTS GROCERIES
  (ID INTEGER  PRIMARY KEY  AUTOINCREMENT,
  USERNAME       TEXT    NOT NULL,
@@ -34,7 +36,7 @@ def index():
     username = session['username']
     
     if "username" in session:
-        #--------- GET ALL ITEMS --------
+        #---- GET ALL ITEMS --------
         if request.method == "GET":
             cur = conn.cursor()
             # gets all items from database that match current user
