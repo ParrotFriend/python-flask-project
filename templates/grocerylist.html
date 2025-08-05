@@ -1,56 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
-    <title>Grocery List</title>
-
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{name}}'s Grocery List</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      backdrop-filter: blur(4px);
+    }
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 15px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      margin-top: 80px;
+      max-width: 500px;
+    }
+    .form-control,
+    .btn {
+      border-radius: 8px;
+    }
+    .grocery-item {
+      background-color: #f8f9fa;
+      border-left: 4px solid black;
+    }
+    .delete-btn {
+      float: right;
+    }
+    .update-btn {
+      margin-right: 10px; /* Space between update and delete buttons */
+    }
+  </style>
 </head>
-<body style="background-image:url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80')">
-    <div class="rounded bg-light border shadow mt-5 text-center" style="width: 30%; margin:auto; height: 800px">
-        <h1 class="mt-2">{{name}}'s Grocery List</h1>
-        <form method="POST" class="p-3">
-            <div class="row g-3 align-items-center"  >
-                <div class="col-md-7">
-                  <input type="text" class="form-control" name="groceryitem" placeholder="enter a grocery item to add to the list" required>
-                </div>
-                <select class="form-control col-md-2" style="width:16% !important" name="quantity">
-                    <option vale="1">1</option>
-                    <option vale="2">2</option>
-                    <option vale="3">3</option>
-                    <option vale="4">4</option>
-                    <option vale="5">5</option>
-                    <option vale="6">6</option>
-                    <option vale="6">6</option>
-                    <option vale="7">7</option>
-                    <option vale="8">8</option>
-                    <option vale="9">9</option>
-                    <option vale="10">10</option>
-                  </select>  
-                <div class="col-auto">
-                  <button type="submit" class="btn btn-primary btn-shadow">Add Item</button>
-                </div>
-              </div>
+<body>
+  <div class="container d-flex justify-content-center">
+    <div class="glass-card w-100 text-center">
+      <h2 class="fw-bold mb-4 text-primary">{{name}}'s Grocery List</h2>
+
+      <!-- SEARCH BAR -->
+      <form method="GET" action="/home" class="mb-3">
+        <div class="input-group">
+          <input type="text" class="form-control" name="search" placeholder="Search grocery items..." value="{{ request.args.get('search', '') }}">
+          <button class="btn btn-outline-secondary" type="submit">Search</button>
+        </div>
+      </form>
+
+      <!-- ADD ITEM FORM -->
+      <form method="POST">
+        <div class="row g-2 mb-4 justify-content-center">
+          <div class="col-md-7">
+            <input type="text" class="form-control" name="groceryitem" placeholder="Add grocery item..." required />
+          </div>
+          <div class="col-md-3">
+            <select class="form-select" name="quantity" required>
+              {% for i in range(1,11) %}
+              <option value="{{i}}">{{i}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+          </div>
+        </div>
+      </form>
+
+      <hr />
+
+      <!-- Grocery Items -->
+      <div class="text-start">
+        {% for x in groceries %}
+        <form action="/delete" method="POST" class="mb-2">
+          <div class="p-3 rounded grocery-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ x[1] }}</strong> - {{ x[0].lower() }}
+              <input type="hidden" value="{{x[0]}}" name="item" />
+            </div>
+            <div>
+              <button type="button" class="btn btn-sm btn-outline-secondary update-btn"
+  onclick="openUpdateModal('{{ x[0]|e }}', '{{ x[1]|e }}')">Update</button>
+              <button type="submit" class="btn btn-sm btn-outline-danger delete-btn">Delete</button>
+            </div>
+          </div>
         </form>
-        <hr>
-        <!-- LIST OF ITEMS-->
+        {% endfor %}
+      </div>
 
-            {% for x in groceries%}
-            <form action="/delete" method="post">
-                <div class="rounded m-2 p-2 border" style="text-align:left"> 
-                    <span class="ps-3 pe-5">{{ x[1] }}</span>
-                    <span>{{ x[0].lower() }}</span>
-                    <input type="hidden" value="{{x[0]}}" name="item">
-                    <button type="submit" class="btn btn-danger btn-sm" style="float:right">Delete</button>
-                </div>
-            </form>         
-            {% endfor %}
-
-
-        <a href="/logout" class="btn btn-warning" style="margin-top:20%">Sign Out</a>
+      <a href="/logout" class="btn btn-warning mt-5 w-100">Sign Out</a>
     </div>
+  </div>
+
+  <!-- Update Modal -->
+  <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="updateModalLabel">Update Grocery Item</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="updateForm" method="POST" action="/update">
+            <input type="hidden" name="old_item" id="old_item">
+            <div class="mb-3">
+              <label for="new_item" class="form-label">New Item Name</label>
+              <input type="text" class="form-control" name="new_item" id="new_item" required>
+            </div>
+            <div class="mb-3">
+              <label for="new_quantity" class="form-label">New Quantity</label>
+              <input type="number" class="form-control" name="new_quantity" id="new_quantity" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Update</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function openUpdateModal(itemName, quantity) {
+      document.getElementById('old_item').value = itemName;
+      document.getElementById('new_item').value = itemName; // Pre-fill with current item name
+      document.getElementById('new_quantity').value = quantity; // Pre-fill with current quantity
+      var myModal = new bootstrap.Modal(document.getElementById('updateModal'));
+      myModal.show();
+    }
+  </script>
 </body>
 </html>
